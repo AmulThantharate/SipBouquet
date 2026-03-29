@@ -1,0 +1,52 @@
+@import "tailwindcss";
+
+@theme inline {
+  --color-background: #f5f1ea;
+  --color-foreground: #2d2416;
+  --color-cream: #f5f1ea;
+  --color-cream-dark: #e8e0d4;
+  --color-espresso: #2d2416;
+  --color-espresso-light: #4a3c2a;
+  --color-matcha: #7fb069;
+  --color-matcha-dark: #5a8a45;
+  --color-matcha-light: #b8d4a8;
+  --color-latte: #c8a882;
+  --color-latte-light: #dcc5a8;
+  --color-mocha: #6b4c3b;
+  --color-rose: #d4a0a0;
+  --color-rose-light: #e8c4c4;
+  --color-amber: #c89654;
+  --color-amber-light: #e0b878;
+  --font-serif: var(--font-serif-loaded), Georgia, serif;
+  --font-sans: var(--font-sans-loaded), system-ui, sans-serif;
+}
+
+body {
+  background: var(--color-cream);
+  color: var(--color-espresso);
+  font-family: var(--font-sans);
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-cream-dark);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-latte);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-mocha);
+}
+
+/* Selection */
+::selection {
+  background: var(--color-matcha-light);
+  color: var(--color-espresso);
+}
