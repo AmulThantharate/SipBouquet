@@ -38,23 +38,27 @@ SipBouquet is a delightful, interactive web application that allows you to craft
 ### Installation
 
 1. **Clone the repository:**
+
    ```bash
    https://github.com/AmulThantharate/SipBouquet.git
    cd sipbouquet
    ```
 
 2. **Install dependencies:**
+
    ```bash
    npm install
    ```
 
 3. **Set up environment variables:**
    Create a `.env.local` file in the root directory and add your Gemini API key:
+
    ```env
    GEMINI_API_KEY=your_api_key_here
    ```
 
 4. **Run the development server:**
+
    ```bash
    npm run dev
    ```
@@ -82,11 +86,13 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 ## 👤 Author
 
 **Amul Thantharate**
-- GitHub: [@your-github-username](https://github.com/your-github-username)
+
+- GitHub: [@AmulThantharate](https://github.com/AmulThantharate)
 
 ## 📄 License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ---
+
 Made with ☕ + 🍵 by Amul Thantharate
