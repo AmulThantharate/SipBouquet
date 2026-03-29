@@ -39,7 +39,7 @@ SipBouquet is a delightful, interactive web application that allows you to craft
 
 1. **Clone the repository:**
    ```bash
-   git clone https://github.com/your-username/SipBouquet.git
+   https://github.com/AmulThantharate/SipBouquet.git
    cd sipbouquet
    ```
 
