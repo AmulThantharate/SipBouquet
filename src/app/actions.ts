@@ -19,9 +19,9 @@ export async function createGiftAction(giftData: GiftData) {
     console.log(`Attempting to upload gift ${shortId} to Vercel Blob...`);
 
     const blob = await put(fileName, JSON.stringify(giftData), {
-      access: 'public',
-      addRandomSuffix: true, // Let Vercel handle the suffix to prevent collisions
-      token: token, // Pass token explicitly just in case
+      access: 'private', // Changed from public to private
+      addRandomSuffix: true,
+      token: token,
     });
 
     console.log('Upload successful:', blob.url);
