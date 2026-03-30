@@ -161,10 +161,56 @@ export function saveGift(gift: GiftData): void {
   localStorage.setItem('sipbouquet_gifts', JSON.stringify(gifts));
 }
 
+export function encodeGift(gift: GiftData): string {
+  const minimalGift = {
+    d: gift.drinks.map(d => d.id),
+    m: gift.message,
+    s: gift.senderName,
+    r: gift.recipientName,
+    t: gift.theme,
+    c: gift.createdAt
+  };
+  const json = JSON.stringify(minimalGift);
+  const base64 = btoa(unescape(encodeURIComponent(json)));
+  return base64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+}
+
+export function decodeGift(encoded: string): GiftData | null {
+  try {
+    // Convert base64url to base64
+    let base64 = encoded.replace(/-/g, '+').replace(/_/g, '/');
+    while (base64.length % 4) {
+      base64 += '=';
+    }
+    
+    const json = decodeURIComponent(escape(atob(base64)));
+    const decoded = JSON.parse(json);
+    const drinks = decoded.d.map((id: string) => DRINKS.find(d => d.id === id)).filter(Boolean) as Drink[];
+    
+    return {
+      id: encoded,
+      drinks,
+      message: decoded.m,
+      senderName: decoded.s,
+      recipientName: decoded.r,
+      theme: decoded.t,
+      bouquetStyle: 'cone',
+      createdAt: decoded.c
+    };
+  } catch {
+    return null;
+  }
+}
+
 export function getGift(id: string): GiftData | null {
   if (typeof window === 'undefined') return null;
+  
+  // Try to find in localStorage first
   const gifts = getGifts();
-  return gifts[id] || null;
+  if (gifts[id]) return gifts[id];
+
+  // If not found, try to decode it as an encoded gift
+  return decodeGift(id);
 }
 
 export function getGifts(): Record<string, GiftData> {

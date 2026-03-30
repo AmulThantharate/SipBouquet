@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
+import Link from 'next/link';
 import { motion } from 'framer-motion';
 import BouquetDisplay from '@/components/BouquetDisplay';
 import { getGift, THEMES } from '@/lib/store';
@@ -66,12 +67,12 @@ export default function GiftPage() {
           <p className="text-espresso-light/60 text-sm max-w-sm">
             This gift link may have expired or the bouquet hasn&apos;t been brewed yet.
           </p>
-          <a
+          <Link
             href="/"
             className="inline-block bg-espresso text-cream px-6 py-3 rounded-full text-sm font-medium mt-4"
           >
             Brew a New One
-          </a>
+          </Link>
         </motion.div>
       </div>
     );
@@ -196,12 +197,12 @@ export default function GiftPage() {
           <p className="text-[9px] sm:text-[10px] text-espresso-light/25 uppercase tracking-[0.15em]">
             made with sipbouquet
           </p>
-          <a
+          <Link
             href="/"
             className="text-[9px] sm:text-[10px] text-espresso-light/40 underline underline-offset-2 hover:text-espresso-light/60 transition-colors"
           >
             make a bouquet now!
-          </a>
+          </Link>
         </motion.div>
       </motion.div>
     </div>

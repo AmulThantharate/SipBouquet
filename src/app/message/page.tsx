@@ -12,7 +12,7 @@ import {
   saveDraftMessage,
   saveDraftNames,
   saveGift,
-  generateId,
+  encodeGift,
 } from '@/lib/store';
 import type { Drink } from '@/lib/store';
 
@@ -73,19 +73,22 @@ export default function MessagePage() {
     saveDraftMessage(message);
     saveDraftNames(senderName, recipientName);
     const theme = getDraftTheme();
-    const id = generateId();
-
-    saveGift({
-      id,
+    
+    const giftData = {
+      id: '', // Will be set after encoding or used as placeholder
       drinks,
       message,
       senderName: senderName || 'Someone special',
       recipientName: recipientName || 'you',
       theme,
-      bouquetStyle: 'cone',
+      bouquetStyle: 'cone' as const,
       createdAt: new Date().toISOString(),
-    });
+    };
 
+    const id = encodeGift(giftData);
+    giftData.id = id;
+
+    saveGift(giftData);
     router.push(`/gift/${id}`);
   };
 
