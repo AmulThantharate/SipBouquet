@@ -26,6 +26,7 @@ export default function MessagePage() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [isCreating, setIsCreating] = useState(false);
   const [charCount, setCharCount] = useState(0);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const saved = getDraftDrinks();
@@ -74,6 +75,7 @@ export default function MessagePage() {
   const handleCreateGift = async () => {
     if (isCreating) return;
     setIsCreating(true);
+    setError(null);
     
     saveDraftMessage(message);
     saveDraftNames(senderName, recipientName);
@@ -98,17 +100,25 @@ export default function MessagePage() {
         console.log('Short ID from action:', result.id);
         router.push(`/gift/${result.id}`);
       } else {
-        console.error('Server action failed:', result.error);
-        // Fallback to base64 if it fails
-        const id = encodeGift(giftData);
-        saveGift({ ...giftData, id });
-        router.push(`/gift/${id}`);
+        console.error('SERVER ERROR:', result.error);
+        setError(`Database Error: ${result.error}. Falling back to long link...`);
+        
+        // Wait 3 seconds so the user can see the error before redirecting to fallback
+        setTimeout(() => {
+          const id = encodeGift(giftData);
+          saveGift({ ...giftData, id });
+          router.push(`/gift/${id}`);
+        }, 3000);
       }
     } catch (err) {
       console.error('Failed to create gift through action:', err);
-      const id = encodeGift(giftData);
-      saveGift({ ...giftData, id });
-      router.push(`/gift/${id}`);
+      setError('Connection failed. Using long link instead.');
+      
+      setTimeout(() => {
+        const id = encodeGift(giftData);
+        saveGift({ ...giftData, id });
+        router.push(`/gift/${id}`);
+      }, 2000);
     } finally {
       setIsCreating(false);
     }
@@ -138,7 +148,21 @@ export default function MessagePage() {
           </motion.p>
         </div>
 
-        {/* Names - Stack on mobile */}
+        {/* Error Alert */}
+        <AnimatePresence>
+          {error && (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0 }}
+              className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-xl text-xs flex items-center gap-2"
+            >
+              ⚠️ {error}
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Names */}
         <motion.div
           className="grid grid-cols-1 sm:grid-cols-2 gap-4"
           initial={{ opacity: 0, y: 10 }}
