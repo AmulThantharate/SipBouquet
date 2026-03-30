@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import Layout from '@/components/Layout';
+import { createGiftAction } from '@/app/actions';
 import {
   getDraftDrinks,
   getDraftTheme,
@@ -23,6 +24,7 @@ export default function MessagePage() {
   const [senderName, setSenderName] = useState('');
   const [recipientName, setRecipientName] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
+  const [isCreating, setIsCreating] = useState(false);
   const [charCount, setCharCount] = useState(0);
 
   useEffect(() => {
@@ -69,8 +71,6 @@ export default function MessagePage() {
     }
   };
 
-  const [isCreating, setIsCreating] = useState(false);
-
   const handleCreateGift = async () => {
     if (isCreating) return;
     setIsCreating(true);
@@ -91,27 +91,21 @@ export default function MessagePage() {
     };
 
     try {
-      console.log('Sending gift to save API...');
-      const res = await fetch('/api/gifts/save', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(giftData),
-      });
+      console.log('Using server action to create gift...');
+      const result = await createGiftAction(giftData);
       
-      if (res.ok) {
-        const { id } = await res.json();
-        console.log('Short ID received:', id);
-        router.push(`/gift/${id}`);
+      if (result.success && result.id) {
+        console.log('Short ID from action:', result.id);
+        router.push(`/gift/${result.id}`);
       } else {
-        const errData = await res.json().catch(() => ({}));
-        console.error('API Error Response:', errData);
-        // Fallback to base64 if KV fails
+        console.error('Server action failed:', result.error);
+        // Fallback to base64 if it fails
         const id = encodeGift(giftData);
         saveGift({ ...giftData, id });
         router.push(`/gift/${id}`);
       }
     } catch (err) {
-      console.error('Failed to save gift API request:', err);
+      console.error('Failed to create gift through action:', err);
       const id = encodeGift(giftData);
       saveGift({ ...giftData, id });
       router.push(`/gift/${id}`);
