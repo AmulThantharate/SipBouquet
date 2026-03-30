@@ -69,13 +69,18 @@ export default function MessagePage() {
     }
   };
 
-  const handleCreateGift = () => {
+  const [isCreating, setIsCreating] = useState(false);
+
+  const handleCreateGift = async () => {
+    if (isCreating) return;
+    setIsCreating(true);
+    
     saveDraftMessage(message);
     saveDraftNames(senderName, recipientName);
     const theme = getDraftTheme();
     
     const giftData = {
-      id: '', // Will be set after encoding or used as placeholder
+      id: '', 
       drinks,
       message,
       senderName: senderName || 'Someone special',
@@ -85,11 +90,30 @@ export default function MessagePage() {
       createdAt: new Date().toISOString(),
     };
 
-    const id = encodeGift(giftData);
-    giftData.id = id;
-
-    saveGift(giftData);
-    router.push(`/gift/${id}`);
+    try {
+      const res = await fetch('/api/gifts/save', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(giftData),
+      });
+      
+      if (res.ok) {
+        const { id } = await res.json();
+        router.push(`/gift/${id}`);
+      } else {
+        // Fallback to base64 if KV fails
+        const id = encodeGift(giftData);
+        saveGift({ ...giftData, id });
+        router.push(`/gift/${id}`);
+      }
+    } catch (err) {
+      console.error('Failed to save gift to KV:', err);
+      const id = encodeGift(giftData);
+      saveGift({ ...giftData, id });
+      router.push(`/gift/${id}`);
+    } finally {
+      setIsCreating(false);
+    }
   };
 
   if (drinks.length === 0) return null;
@@ -261,12 +285,24 @@ export default function MessagePage() {
           <motion.button
             id="create-gift"
             onClick={handleCreateGift}
-            disabled={!message.trim()}
-            className="w-full bg-espresso text-cream px-8 py-4 rounded-full text-base font-medium shadow-lg hover:shadow-xl transition-all disabled:opacity-40 disabled:cursor-not-allowed active:scale-95"
-            whileHover={message.trim() ? { scale: 1.02 } : {}}
-            whileTap={message.trim() ? { scale: 0.98 } : {}}
+            disabled={!message.trim() || isCreating}
+            className="w-full bg-espresso text-cream px-8 py-4 rounded-full text-base font-medium shadow-lg hover:shadow-xl transition-all disabled:opacity-40 disabled:cursor-not-allowed active:scale-95 flex items-center justify-center gap-2"
+            whileHover={message.trim() && !isCreating ? { scale: 1.02 } : {}}
+            whileTap={message.trim() && !isCreating ? { scale: 0.98 } : {}}
           >
-            🎁 Create Your Gift
+            {isCreating ? (
+              <>
+                <motion.span
+                  animate={{ rotate: 360 }}
+                  transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
+                >
+                  ⏳
+                </motion.span>
+                Brewing your link...
+              </>
+            ) : (
+              '🎁 Create Your Gift'
+            )}
           </motion.button>
         </motion.div>
       </div>

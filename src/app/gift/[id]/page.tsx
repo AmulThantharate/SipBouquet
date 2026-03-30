@@ -15,11 +15,33 @@ export default function GiftPage() {
   const [copied, setCopied] = useState(false);
 
   useEffect(() => {
-    if (params.id) {
-      const g = getGift(params.id as string);
-      setGift(g);
+    async function loadGift() {
+      if (params.id) {
+        const idString = params.id as string;
+        
+        // Try local base64 decoding first (backward compatibility)
+        const localGift = getGift(idString);
+        if (localGift && idString.length > 20) {
+          setGift(localGift);
+          setLoading(false);
+          return;
+        }
+
+        // If not base64 or not found, try fetching from KV API
+        try {
+          const res = await fetch(`/api/gifts/${idString}`);
+          if (res.ok) {
+            const data = await res.json();
+            setGift(data);
+          }
+        } catch (error) {
+          console.error('Failed to fetch gift:', error);
+        }
+      }
+      setLoading(false);
     }
-    setLoading(false);
+
+    loadGift();
   }, [params.id]);
 
   const handleShare = async () => {
