@@ -85,9 +85,9 @@ export default function GiftPage() {
           className="space-y-4"
         >
           <span className="text-6xl block">🫖</span>
-          <h1 className="font-serif text-2xl text-espresso">Gift not found</h1>
+          <h1 className="font-serif text-2xl text-espresso">Gift Not Found</h1>
           <p className="text-espresso-light/60 text-sm max-w-sm">
-            This gift link may have expired or the bouquet hasn&apos;t been brewed yet.
+            This link may be invalid, expired, or still brewing. Ask the sender to resend it, then try again.
           </p>
           <Link
             href="/"
