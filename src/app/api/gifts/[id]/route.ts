@@ -20,12 +20,23 @@ export async function GET(
        return NextResponse.json({ error: 'Not a short ID' }, { status: 404 });
     }
 
-    // List the blobs matching the prefix with the token
-    const { blobs } = await list({ 
-      prefix: `gifts/${id}.json`,
+    // Primary lookup for deterministic filename.
+    const exactPrefix = `gifts/${id}.json`;
+    let { blobs } = await list({
+      prefix: exactPrefix,
       token: token
     });
-    
+
+    // Backward compatibility: older uploads may include a random suffix.
+    if (blobs.length === 0) {
+      const legacyPrefix = `gifts/${id}`;
+      const legacyResults = await list({
+        prefix: legacyPrefix,
+        token: token
+      });
+      blobs = legacyResults.blobs.filter((blob) => blob.pathname.endsWith('.json'));
+    }
+
     if (blobs.length === 0) {
       return NextResponse.json({ error: 'Gift not found' }, { status: 404 });
     }

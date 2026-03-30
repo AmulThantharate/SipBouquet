@@ -10,7 +10,8 @@ export async function saveGiftToBlob(gift: GiftData): Promise<string> {
   
   await put(fileName, JSON.stringify(gift), {
     access: 'private', // Match private store configuration
-    addRandomSuffix: true,
+    // Keep filename deterministic so we can fetch by short ID later.
+    addRandomSuffix: false,
     token: token
   });
   

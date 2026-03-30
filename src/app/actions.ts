@@ -20,7 +20,8 @@ export async function createGiftAction(giftData: GiftData) {
 
     const blob = await put(fileName, JSON.stringify(giftData), {
       access: 'private', // Changed from public to private
-      addRandomSuffix: true,
+      // Keep filename deterministic so short ID -> blob key mapping is stable.
+      addRandomSuffix: false,
       token: token,
     });
 
