@@ -91,6 +91,7 @@ export default function MessagePage() {
     };
 
     try {
+      console.log('Sending gift to save API...');
       const res = await fetch('/api/gifts/save', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -99,15 +100,18 @@ export default function MessagePage() {
       
       if (res.ok) {
         const { id } = await res.json();
+        console.log('Short ID received:', id);
         router.push(`/gift/${id}`);
       } else {
+        const errData = await res.json().catch(() => ({}));
+        console.error('API Error Response:', errData);
         // Fallback to base64 if KV fails
         const id = encodeGift(giftData);
         saveGift({ ...giftData, id });
         router.push(`/gift/${id}`);
       }
     } catch (err) {
-      console.error('Failed to save gift to KV:', err);
+      console.error('Failed to save gift API request:', err);
       const id = encodeGift(giftData);
       saveGift({ ...giftData, id });
       router.push(`/gift/${id}`);

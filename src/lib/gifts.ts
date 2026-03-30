@@ -7,11 +7,14 @@ export async function saveGiftToBlob(gift: GiftData): Promise<string> {
   const shortId = nanoid(8);
   const fileName = `gifts/${shortId}.json`;
   
-  await put(fileName, JSON.stringify(gift), {
+  console.log(`Uploading to blob: ${fileName}`);
+  
+  const blob = await put(fileName, JSON.stringify(gift), {
     access: 'public',
-    addRandomSuffix: false, // This is key for predictable short links
+    addRandomSuffix: false, // This ensures our clean ID is kept
   });
   
+  console.log('Blob upload result URL:', blob.url);
   return shortId;
 }
 
