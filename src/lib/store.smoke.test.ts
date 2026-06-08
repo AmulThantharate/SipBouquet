@@ -51,7 +51,7 @@ beforeEach(() => {
 });
 
 describe('store smoke flow', () => {
-  it('encodes a gift into a shareable id and decodes it back', () => {
+  it('encodes a gift into a shareable id and decodes it back', async () => {
     const gift: GiftData = {
       id: '',
       drinks: DRINKS.slice(0, 3),
@@ -63,8 +63,8 @@ describe('store smoke flow', () => {
       createdAt: '2026-06-08T00:00:00.000Z',
     };
 
-    const id = encodeGift(gift);
-    const decoded = decodeGift(id);
+    const id = await encodeGift(gift);
+    const decoded = await decodeGift(id);
 
     expect(id).toMatch(/^[A-Za-z0-9_-]+$/);
     expect(decoded).toMatchObject({
@@ -81,7 +81,7 @@ describe('store smoke flow', () => {
     );
   });
 
-  it('saves draft and gift data in localStorage', () => {
+  it('saves draft and gift data in localStorage', async () => {
     const drinks = DRINKS.slice(1, 4);
     const gift: GiftData = {
       id: 'gift-1',
@@ -109,6 +109,6 @@ describe('store smoke flow', () => {
       sender: gift.senderName,
       recipient: gift.recipientName,
     });
-    expect(getGift(gift.id)).toEqual(gift);
+    expect(await getGift(gift.id)).toEqual(gift);
   });
 });

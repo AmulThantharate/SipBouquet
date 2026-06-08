@@ -15,10 +15,11 @@ export default function GiftPage() {
   const [copied, setCopied] = useState(false);
 
   useEffect(() => {
-    function loadGift() {
+    async function loadGift() {
       if (params.id) {
         const idString = params.id as string;
-        setGift(getGift(idString));
+        const decoded = await getGift(idString);
+        setGift(decoded);
       }
       setLoading(false);
     }

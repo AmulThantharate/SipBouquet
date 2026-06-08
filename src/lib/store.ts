@@ -161,7 +161,7 @@ export function saveGift(gift: GiftData): void {
   localStorage.setItem('sipbouquet_gifts', JSON.stringify(gifts));
 }
 
-export function encodeGift(gift: GiftData): string {
+export async function encodeGift(gift: GiftData): Promise<string> {
   const minimalGift = {
     d: gift.drinks.map(d => d.id),
     m: gift.message,
@@ -171,11 +171,27 @@ export function encodeGift(gift: GiftData): string {
     c: gift.createdAt
   };
   const json = JSON.stringify(minimalGift);
-  const base64 = btoa(unescape(encodeURIComponent(json)));
-  return base64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+  try {
+    const bytes = new TextEncoder().encode(json);
+    const blob = new Blob([bytes]);
+    const stream = blob.stream().pipeThrough(new CompressionStream('deflate-raw'));
+    const response = new Response(stream);
+    const buffer = await response.arrayBuffer();
+    
+    const uint8 = new Uint8Array(buffer);
+    let binary = '';
+    for (let i = 0; i < uint8.length; i++) {
+      binary += String.fromCharCode(uint8[i]);
+    }
+    const base64 = btoa(binary);
+    return base64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+  } catch {
+    const base64 = btoa(unescape(encodeURIComponent(json)));
+    return base64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+  }
 }
 
-export function decodeGift(encoded: string): GiftData | null {
+export async function decodeGift(encoded: string): Promise<GiftData | null> {
   try {
     // Convert base64url to base64
     let base64 = encoded.replace(/-/g, '+').replace(/_/g, '/');
@@ -183,7 +199,21 @@ export function decodeGift(encoded: string): GiftData | null {
       base64 += '=';
     }
     
-    const json = decodeURIComponent(escape(atob(base64)));
+    let json: string;
+    try {
+      const binary = atob(base64);
+      const bytes = new Uint8Array(binary.length);
+      for (let i = 0; i < binary.length; i++) {
+        bytes[i] = binary.charCodeAt(i);
+      }
+      const blob = new Blob([bytes]);
+      const stream = blob.stream().pipeThrough(new DecompressionStream('deflate-raw'));
+      const response = new Response(stream);
+      json = await response.text();
+    } catch {
+      json = decodeURIComponent(escape(atob(base64)));
+    }
+    
     const decoded = JSON.parse(json);
     const drinks = decoded.d.map((id: string) => DRINKS.find(d => d.id === id)).filter(Boolean) as Drink[];
     
@@ -202,7 +232,7 @@ export function decodeGift(encoded: string): GiftData | null {
   }
 }
 
-export function getGift(id: string): GiftData | null {
+export async function getGift(id: string): Promise<GiftData | null> {
   if (typeof window === 'undefined') return null;
   
   // Try to find in localStorage first
@@ -210,7 +240,7 @@ export function getGift(id: string): GiftData | null {
   if (gifts[id]) return gifts[id];
 
   // If not found, try to decode it as an encoded gift
-  return decodeGift(id);
+  return await decodeGift(id);
 }
 
 export function getGifts(): Record<string, GiftData> {

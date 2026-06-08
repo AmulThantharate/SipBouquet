@@ -91,7 +91,7 @@ export default function MessagePage() {
       createdAt: new Date().toISOString(),
     };
 
-    const id = encodeGift(giftData);
+    const id = await encodeGift(giftData);
     saveGift({ ...giftData, id });
     router.push(`/gift/${id}`);
     setIsCreating(false);
