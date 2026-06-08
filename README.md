@@ -17,7 +17,7 @@ SipBouquet is a delightful, interactive web application that allows you to craft
   - **Botanical Garden:** Earthy greens for a natural look.
 - **🤖 AI Note Generator:** Integrated with Gemini AI to craft heartfelt, personalized messages for your recipients.
 - **📱 Fully Responsive:** A premium experience across all devices, from mobile to desktop.
-- **🎁 Instant Sharing:** Generate a unique link to send your bouquet to someone special.
+- **🎁 Instant Sharing:** Generate an encoded local-storage link to send your bouquet to someone special.
 
 ## 🛠️ Tech Stack
 
@@ -26,6 +26,7 @@ SipBouquet is a delightful, interactive web application that allows you to craft
 - **Styling:** [Tailwind CSS](https://tailwindcss.com/)
 - **Animations:** [Framer Motion](https://www.framer.com/motion/)
 - **AI:** [Google Gemini API](https://ai.google.dev/)
+- **Storage:** Browser `localStorage` and encoded URLs, with no database or Vercel storage required.
 - **Icons/Emojis:** Native Unicode Emojis
 
 ## 🚀 Getting Started

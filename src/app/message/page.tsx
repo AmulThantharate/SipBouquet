@@ -4,7 +4,6 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import Layout from '@/components/Layout';
-import { createGiftAction } from '@/app/actions';
 import {
   getDraftDrinks,
   getDraftTheme,
@@ -92,36 +91,10 @@ export default function MessagePage() {
       createdAt: new Date().toISOString(),
     };
 
-    try {
-      console.log('Using server action to create gift...');
-      const result = await createGiftAction(giftData);
-      
-      if (result.success && result.id) {
-        console.log('Short ID from action:', result.id);
-        router.push(`/gift/${result.id}`);
-      } else {
-        console.error('SERVER ERROR:', result.error);
-        setError(`Database Error: ${result.error}. Falling back to long link...`);
-        
-        // Wait 3 seconds so the user can see the error before redirecting to fallback
-        setTimeout(() => {
-          const id = encodeGift(giftData);
-          saveGift({ ...giftData, id });
-          router.push(`/gift/${id}`);
-        }, 3000);
-      }
-    } catch (err) {
-      console.error('Failed to create gift through action:', err);
-      setError('Connection failed. Using long link instead.');
-      
-      setTimeout(() => {
-        const id = encodeGift(giftData);
-        saveGift({ ...giftData, id });
-        router.push(`/gift/${id}`);
-      }, 2000);
-    } finally {
-      setIsCreating(false);
-    }
+    const id = encodeGift(giftData);
+    saveGift({ ...giftData, id });
+    router.push(`/gift/${id}`);
+    setIsCreating(false);
   };
 
   if (drinks.length === 0) return null;
